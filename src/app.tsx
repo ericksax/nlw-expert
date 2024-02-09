@@ -5,9 +5,33 @@ import {
   NoteCard
 } from './noteCard'
 import { InitialNoteCard } from './InitialCardNote'
-import { Title } from '@radix-ui/react-dialog'
+import { useState } from 'react'
+
+interface Note {
+  id: string
+  date: Date
+  content: string
+}
+
 
 export function App() {
+  const [notes, setNotes] = useState<Note[]>([])
+
+  const handleAddNewNote = (content: string) => {
+
+    const newNote = {
+      id: crypto.randomUUID(),
+      date: new Date(),
+      content: content
+    }
+
+    setNotes((state) => [newNote, ...state])
+  }
+
+  const handleRemoveNote = (id: string) => {
+    setNotes((state) => state.filter((note) => note.id !== id))
+  }
+
   return (
     <main className='flex flex-col m-auto max-w-6xl space-y-6 mt-16'>
 
@@ -18,12 +42,8 @@ export function App() {
       <div className='h-px w-full bg-slate-500'></div>
 
       <div className='grid grid-cols-3 auto-rows-[250px] gap-6'>
-        <InitialNoteCard nota={{ title: "Title", content: "Lorem ipsum dolor, sit amet consectetur adipisicing elit.Ducimus laboriosam accusantium provident placeat voluptatum sed nam optio architecto nihil illo beatae molestiae iusto vitae et autem, saepe ad laudantium maiores!" }} />
-        <NoteCard nota={{ title: "Title", content: "Lorem ipsum dolor, sit amet consectetur adipisicing elit.Ducimus laboriosam accusantium provident placeat voluptatum sed nam optio architecto nihil illo beatae molestiae iusto vitae et autem, saepe ad laudantium maiores!" }} />
-        <NoteCard nota={{ title: "Title", content: "Lorem ipsum dolor, sit amet consectetur adipisicing elit.Ducimus laboriosam accusantium provident placeat voluptatum sed nam optio architecto nihil illo beatae molestiae iusto vitae et autem, saepe ad laudantium maiores!" }} />
-        <NoteCard nota={{ title: "Title", content: "Lorem ipsum dolor, sit amet consectetur adipisicing elit.Ducimus laboriosam accusantium provident placeat voluptatum sed nam optio architecto nihil illo beatae molestiae iusto vitae et autem, saepe ad laudantium maiores!" }} />
-
-
+        <InitialNoteCard handleAddNewNote={handleAddNewNote} />
+        {notes.map((note: Note) => <NoteCard key={note.id} note={note} handleRemoveNote={handleRemoveNote} />)}
       </div>
     </main>
   )
