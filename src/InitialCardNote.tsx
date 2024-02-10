@@ -5,12 +5,16 @@ import { toast } from "sonner"
 interface InitialNoteCardProps {
     handleAddNewNote: (content: string) => void
 }
+
+let speechRecognition: SpeechRecognition | null = null
+
 export const InitialNoteCard = ({ handleAddNewNote }: InitialNoteCardProps) => {
     const [ShouldBeWriten, setShouldBeWriten] = useState(true)
     const [IsRecordingVoice, setIsRecordingVoice] = useState(false)
     const [content, setContent] = useState("")
 
     const ref = useRef<HTMLButtonElement>(null)
+
 
     function handleInputText() {
         setShouldBeWriten((state) => !state)
@@ -31,10 +35,48 @@ export const InitialNoteCard = ({ handleAddNewNote }: InitialNoteCardProps) => {
         toast.success("Nota adicionada com sucesso!")
     }
 
-    function handleRecordingVoice() {
+    function handleStopTranscription() {
+
+        setIsRecordingVoice((state) => !state)
+
+        if (content == "") {
+            setShouldBeWriten((state) => !state)
+        }
+
+        speechRecognition?.stop()
+
+    }
+
+    function handleStartRecording() {
         setIsRecordingVoice((state) => !state)
         setShouldBeWriten((state) => !state)
+        const isSpeechRecognitionAPIAvaliable = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window
+
+        if (!isSpeechRecognitionAPIAvaliable) {
+            toast.error("Nenhuma API de reconhecimento de fala disponível")
+            return
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+        speechRecognition = new SpeechRecognition()
+
+        speechRecognition.lang = "pt-BR"
+        speechRecognition.continuous = true
+        speechRecognition.maxAlternatives = 1
+        speechRecognition.interimResults = true
+
+
+        speechRecognition.start()
+        speechRecognition.onresult = (event) => {
+            const transcription = Array.from(event.results).reduce((text, result) => {
+                return text.concat(result[0].transcript)
+            }, "")
+
+            setContent(transcription)
+        }
+
     }
+
 
     return (
         <Dialog.Root>
@@ -51,7 +93,7 @@ export const InitialNoteCard = ({ handleAddNewNote }: InitialNoteCardProps) => {
 
             <Dialog.Portal>
                 <Dialog.Overlay className="inset-0 fixed bg-black/60" />
-                <Dialog.Content className="fixed max-w-[640px] w-full h-[60vh]  top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-700 p-5 z-10 flex flex-col rounded-md overflow-x-hidden">
+                <Dialog.Content className="fixed inset-0 md:inset-auto md:max-w-[640px] md:w-full md:h-[60vh]  md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 bg-slate-700 p-5 z-10 flex flex-col md:rounded-md overflow-x-hidden">
                     <div className="flex flex-1 flex-col gap-3 p-5 ">
                         <Dialog.Close >
                             <button ref={ref} className="absolute top-0 right-0 p-1 bg-slate-800 text-slate-600">
@@ -65,7 +107,7 @@ export const InitialNoteCard = ({ handleAddNewNote }: InitialNoteCardProps) => {
                             {ShouldBeWriten ? (
                                 <p className="text-slate-400 text-[14px] w-full">
                                     Comece {" "}
-                                    <button onClick={handleRecordingVoice} type="button" className="text-lime-400">
+                                    <button onClick={handleStartRecording} type="button" className="text-lime-400">
                                         gravando uma nota
                                     </button>
                                     {" "} em audio ou se preferir {" "}
@@ -74,13 +116,18 @@ export const InitialNoteCard = ({ handleAddNewNote }: InitialNoteCardProps) => {
                                     </button>.
                                 </p>
                             ) : (
-                                <textarea autoFocus onChange={handleInputChange} className="text-slate-400 text-[14px] w-full h-full outline-none resize-none bg-transparent"></textarea>
+                                <textarea
+                                    autoFocus
+                                    onChange={handleInputChange}
+                                    value={content}
+                                    className="text-slate-400 text-[14px] w-full  outline-none resize-none bg-transparent"></textarea>
                             )}
+
                             {IsRecordingVoice ? (
                                 <button
                                     type="button"
                                     className="flex justify-center items-center gap-2 p-3 bg-slate-800 w-full absolute bottom-0 left-0 text-slate-300 font-semibold text-[14px]"
-                                    onClick={() => setIsRecordingVoice((state) => !state)}
+                                    onClick={handleStopTranscription}
                                 >
 
                                     <div className="bg-red-500  h-2 w-2 rounded-full animate-pulse" />

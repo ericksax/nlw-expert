@@ -52,15 +52,15 @@ export function App() {
   })
 
   return (
-    <main className='flex flex-col m-auto max-w-6xl space-y-6 mt-16'>
+    <main className='flex flex-col m-auto max-w-6xl space-y-6 mt-16 p-5'>
 
-      <img src={logo} alt="nlw expeert" width={124.5} height={24} />
+      <img src={logo} alt="nlw expert" width={124.5} height={24} />
 
       <input onChange={(e) => setTerm(e.target.value)} type="text" placeholder="Busque em suas notas..." className='w-full text-slate-500 text-3xl bg-transparent placeholder:font-semibold tracking-tighter outline-none focus:placeholder-transparent' />
 
       <div className='h-px w-full bg-slate-500'></div>
 
-      <div className='grid grid-cols-3 auto-rows-[250px] gap-6'>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[250px] gap-6'>
         <InitialNoteCard handleAddNewNote={handleAddNewNote} />
         {filteredNotes.map((note: Note) => <NoteCard key={note.id} note={note} handleRemoveNote={handleRemoveNote} />)}
       </div>

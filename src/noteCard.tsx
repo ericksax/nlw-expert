@@ -28,7 +28,7 @@ export const NoteCard = ({ note, handleRemoveNote }: NoteCardProps) => {
 
             <Dialog.Portal>
                 <Dialog.Overlay className="inset-0 fixed bg-black/60" />
-                <Dialog.Content className="fixed max-w-[640px] w-full h-[60vh]  top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-700 p-5 z-10 flex flex-col rounded-md overflow-x-hidden">
+                <Dialog.Content className="fixed inset-0 md:max-w-[640px] md:w-full md:h-[60vh]  md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 bg-slate-700 p-5 z-10 flex flex-col md:rounded-md overflow-x-hidden">
                     <div className="flex flex-1 flex-col gap-3 p-5 ">
                         <Dialog.Close><span className="absolute top-0 right-0 p-1 bg-slate-800 text-slate-600">
                             <X size={20} />
